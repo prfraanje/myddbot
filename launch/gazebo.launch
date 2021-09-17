@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+  <arg name="world" default="empty"/> 
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+  
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find myddbot)/model/simple.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
+
+  <arg name="model" default="$(find myddbot)/model/myddbot.xacro"/>
+  <arg name="rvizconfig" default="$(find myddbot)/rviz/urdf.rviz" />
+
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+
+  <arg name="gui_joint" default="false"/>
+    <node if="$(arg gui_joint)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+  <node unless="$(arg gui_joint)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+  
+  <node name="myddbot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+   args="-urdf -param robot_description -model myddbot -x 2 -y 2 -z 2" />
+
+
+  <!-- Make map -->
+  <node name="slam_gmapping" pkg="gmapping" type="slam_gmapping" args="scan:=scan" />
+
+  <!-- Map server -->
+  <node pkg="map_server" name="map_server" type="map_server" output="screen">
+         <param name="resolution" value="0.4" />
+		
+		<!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
+                <!-- param name="frame_id" type="string" value="world" / -->
+                <param name="frame_id" type="string" value="map" />
+		
+		<!-- maximum range to integrate (speedup!) -->
+                <param name="sensor_model/max_range" value="80.0" />
+                <param name="map_scale" value="30" />
+		
+		<!-- data source to integrate (PointCloud2) -->
+                <!--remap from="cloud_in" to="/laserCloud" /-->
+  </node>
+
+  <!-- AMCL localisation (copied from turtlebot3_navigation) -->
+  <!-- does not do very much yet -->
+  <include file="$(find myddbot)/launch/amcl.launch"/>
+
+  <!-- move_base -->
+  <include file="$(find myddbot)/launch/move_base.launch">
+    <arg name="move_forward_only" value="false"/>
+  </include>
+
+
+  <!-- teleop -->
+  <node name="teleop_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
+	launch-prefix="gnome-terminal -e" />
+  
+</launch>
