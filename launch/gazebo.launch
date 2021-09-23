@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
+  <!-- set some parameters for simulation in gazebo -->
   <arg name="world" default="empty"/> 
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
@@ -17,31 +18,41 @@
     <arg name="debug" value="$(arg debug)"/>
   </include>
 
-
+  
+  <!-- specify myddbot model, and start joint and robot state publishers, 
+       that keep track of the joints states and the complete robot kinematics respectively -->
   <arg name="model" default="$(find myddbot)/model/myddbot.xacro"/>
   <arg name="rvizconfig" default="$(find myddbot)/rviz/urdf.rviz" />
 
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
 
   <arg name="gui_joint" default="false"/>
-    <node if="$(arg gui_joint)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+  <node if="$(arg gui_joint)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
   <node unless="$(arg gui_joint)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
-
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
-
+  <!-- Run RViz and visualize the myddbot robot-->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
-  
+
+  <!-- spawn the myddbot in gazebo, that simulates the 
+       dynamics of the myddbot and its environment -->
   <node name="myddbot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
-   args="-urdf -param robot_description -model myddbot -x 2 -y 2 -z 2" />
+   args="-urdf -param robot_description -model myddbot -x 0 -y 0 -z 2" />
 
 
   <!-- Make map -->
-  <node name="slam_gmapping" pkg="gmapping" type="slam_gmapping" args="scan:=scan" />
+  <node name="slam_gmapping" pkg="gmapping" type="slam_gmapping" args="scan:=scan">
+    <param name="base_frame" value="base_link"/>
+    <param name="odom_frame" value="odom"/>
+    <param name="map_frame"  value="map"/>
+    <rosparam command="load" file="$(find myddbot)/param/gmapping_params.yaml" />
+  </node>
 
   <!-- Map server -->
+
   <node pkg="map_server" name="map_server" type="map_server" output="screen">
-         <param name="resolution" value="0.4" />
+    <param name="resolution" value="0.05" />  <!-- was 0.4 -->
+    <!-- param name="origin" value="[-10.0, -10.0, 0.0]" / -->
 		
 		<!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
                 <!-- param name="frame_id" type="string" value="world" / -->
@@ -55,18 +66,27 @@
                 <!--remap from="cloud_in" to="/laserCloud" /-->
   </node>
 
+  
   <!-- AMCL localisation (copied from turtlebot3_navigation) -->
   <!-- does not do very much yet -->
+  <!-- You can use AMCL as well, but then you better work with a static map. -->
   <include file="$(find myddbot)/launch/amcl.launch"/>
+  -->
 
-  <!-- move_base -->
+  <!-- move_base, this contains the planning of the robot and makes use of the 
+       map and the robots estimated position -->
   <include file="$(find myddbot)/launch/move_base.launch">
     <arg name="move_forward_only" value="false"/>
   </include>
 
-
-  <!-- teleop -->
+  <!-- explore lite is a node that drives the robot automatically to explore an unknown environment
+       just comment it if you do not want to use it -->
+  <include file="$(find explore_lite)/launch/explore.launch">
+  </include>
+  
+  <!-- teleop, this is for driving the robot by keyboard -->
   <node name="teleop_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
 	launch-prefix="gnome-terminal -e" />
+
   
 </launch>
