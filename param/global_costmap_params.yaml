@@ -1,7 +1,9 @@
 global_costmap:
   global_frame: map
-  origin_x: -5.0
-  origin_y: -5.0
+  width: 20
+  height: 20
+  origin_x: -10.0
+  origin_y: -10.0
   robot_base_frame: base_footprint
 
   update_frequency: 10.0

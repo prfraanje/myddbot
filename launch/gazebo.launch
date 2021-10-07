@@ -23,7 +23,6 @@
        that keep track of the joints states and the complete robot kinematics respectively -->
   <arg name="model" default="$(find myddbot)/model/myddbot.xacro"/>
   <arg name="rvizconfig" default="$(find myddbot)/rviz/urdf.rviz" />
-
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
 
   <arg name="gui_joint" default="false"/>
@@ -49,27 +48,27 @@
   </node>
 
   <!-- Map server -->
-
-  <node pkg="map_server" name="map_server" type="map_server" output="screen">
-    <param name="resolution" value="0.05" />  <!-- was 0.4 -->
-    <!-- param name="origin" value="[-10.0, -10.0, 0.0]" / -->
+  <!-- <node pkg="map_server" name="map_server" type="map_server" output="screen"> -->
+  <!--   <param name="resolution" value="0.05" />  <!-\- was 0.4 -\-> -->
+  <!--   <!-\- param name="origin" value="[-10.0, -10.0, 0.0]" / -\-> -->
 		
-		<!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
-                <!-- param name="frame_id" type="string" value="world" / -->
-                <param name="frame_id" type="string" value="map" />
+  <!-- 		<!-\- fixed map frame (set to 'map' if SLAM or localization running!) -\-> -->
+  <!--               <!-\- param name="frame_id" type="string" value="world" / -\-> -->
+  <!--               <param name="frame_id" type="string" value="map" /> -->
 		
-		<!-- maximum range to integrate (speedup!) -->
-                <param name="sensor_model/max_range" value="80.0" />
-                <param name="map_scale" value="30" />
+  <!-- 		<!-\- maximum range to integrate (speedup!) -\-> -->
+  <!--               <param name="sensor_model/max_range" value="80.0" /> -->
+  <!--               <param name="map_scale" value="30" /> -->
 		
-		<!-- data source to integrate (PointCloud2) -->
-                <!--remap from="cloud_in" to="/laserCloud" /-->
-  </node>
+  <!-- 		<!-\- data source to integrate (PointCloud2) -\-> -->
+  <!--               <!-\-remap from="cloud_in" to="/laserCloud" /-\-> -->
+  <!-- </node> -->
 
   
   <!-- AMCL localisation (copied from turtlebot3_navigation) -->
   <!-- does not do very much yet -->
   <!-- You can use AMCL as well, but then you better work with a static map. -->
+<!--
   <include file="$(find myddbot)/launch/amcl.launch"/>
   -->
 
@@ -81,9 +80,11 @@
 
   <!-- explore lite is a node that drives the robot automatically to explore an unknown environment
        just comment it if you do not want to use it -->
+<!--
   <include file="$(find explore_lite)/launch/explore.launch">
   </include>
-  
+-->
+
   <!-- teleop, this is for driving the robot by keyboard -->
   <node name="teleop_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
 	launch-prefix="gnome-terminal -e" />
