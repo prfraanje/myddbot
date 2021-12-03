@@ -89,6 +89,6 @@
   <node name="teleop_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
 	launch-prefix="xterm -e" />
 
-  <node "fit_screen" pgk="myddbot" type="scripts/fit_screen.sh" />
+  <node name="fit_screen" pkg="myddbot" type="fit_screen.sh" />
   
 </launch>
