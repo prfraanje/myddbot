@@ -3,13 +3,15 @@
 
 <robot name="myddbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!--
+  <!--         front/forward
+
         |      caster     |    ^
-        |                 |    | length
+  left  |                 |    | length   right
         |        ^ x      |    |
         |        |        |    |
       wl|<-   y<-O      ->|wr  v
          <-   baseline  ->
+                 back
   -->
   
   <xacro:property name="baseline" value="1.0" />

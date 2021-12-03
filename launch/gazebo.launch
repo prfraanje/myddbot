@@ -87,7 +87,7 @@
 
   <!-- teleop, this is for driving the robot by keyboard -->
   <node name="teleop_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py"
-	launch-prefix="gnome-terminal -e" />
+	launch-prefix="xterm -e" />
 
   
 </launch>

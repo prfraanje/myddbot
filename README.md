@@ -1,6 +1,10 @@
 # myddbot
-Simulation of differential drive robot in ROS/Gazebo, start by:
+Simulation of differential drive robot in ROS/Gazebo. 
 
 ```
 roslaunch myddbot gazebo.launch
 ```
+
+
+
+
