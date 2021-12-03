@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+sleep 7
+
 wmctrl -r "teleop_twist_keyboard" -e "0,0,0,920,400"
 wmctrl -r "gazebo.launch"         -e "0,0,420,920,610"
 
